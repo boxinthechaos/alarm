@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 페이지</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Alarm.html의 CSS를 여기에 붙여넣으세요. */
+    body { font-family: 'Noto Sans KR', sans-serif; padding: 40px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+<h1>관리자 대시보드</h1>
+<h2>전체 알람 설정 기록</h2>
+<table>
+  <thead>
+  <tr>
+    <th>사용자</th>
+    <th>설정 시간</th>
+    <th>설정 음악</th>
+  </tr>
+  </thead>
+  <tbody id="alarm-table-body">
+  </tbody>
+</table>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('/admin/alarms')
+            .then(response => response.json())
+            .then(data => {
+              const tableBody = document.getElementById('alarm-table-body');
+              tableBody.innerHTML = ''; // 초기화
+
+              data.forEach(alarm => {
+                const row = `<tr>
+                                        <td>${alarm.user}</td>
+                                        <td>${alarm.time}</td>
+                                        <td>${alarm.song}</td>
+                                     </tr>`;
+                tableBody.innerHTML += row;
+              });
+            })
+            .catch(error => console.error('알람 데이터 로딩 실패:', error));
+  });
+</script>
+</body>
+</html>

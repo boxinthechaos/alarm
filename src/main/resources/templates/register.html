@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --primary-color: #6c5ce7;
+            --text-color: #333;
+            --label-color: #555;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .auth-card {
+            background-color: var(--card-bg-color);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--label-color);
+        }
+
+        /* ✨ 이메일/인증번호 입력을 위해 버튼을 가로로 배치하는 CSS 추가 */
+        .input-with-btn {
+            display: flex;
+            gap: 8px;
+        }
+        .input-with-btn .form-control {
+            flex: 1; /* 인풋창이 남은 공간을 다 차지하게 함 */
+        }
+        .btn-small {
+            padding: 0 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #e9ecef;
+            color: #333;
+            white-space: nowrap;
+        }
+        .btn-small:hover {
+            background-color: #dee2e6;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box; /* 패딩 삐져나감 방지 */
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            margin-top: 10px;
+        }
+        .btn:disabled {
+            background-color: #b5aee9;
+            cursor: not-allowed;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px;
+            border-radius: 50%;
+            background-color: var(--card-bg-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease-in-out;
+            color: var(--text-color);
+        }
+        .back-btn:hover {
+            transform: scale(1.05);
+        }
+        .back-btn svg {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<a href="/alarm" class="back-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+</a>
+<div class="auth-card">
+    <h1>회원가입</h1>
+    <form id="registerForm" th:action="@{/auth/register}" method="post">
+
+        <div class="form-group">
+            <label for="username">닉네임</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <div class="input-with-btn">
+                <input type="email" id="email" name="email" class="form-control" placeholder="example@email.com" required>
+                <button type="button" id="sendCodeBtn" class="btn-small">인증번호 발송</button>
+            </div>
+        </div>
+
+        <div class="form-group" id="codeGroup" style="display: none;">
+            <label for="verificationCode">인증번호 입력</label>
+            <div class="input-with-btn">
+                <input type="text" id="verificationCode" name="verificationCode" class="form-control" placeholder="6자리 숫자">
+                <button type="button" id="verifyCodeBtn" class="btn-small">확인</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn" disabled>가입하기 (이메일 인증 필요)</button>
+    </form>
+    <a href="/auth/login">이미 계정이 있으신가요? 로그인</a>
+</div>
+
+<script>
+    let isEmailVerified = false; // 이메일 인증 완료 여부 플래그
+
+    const sendCodeBtn = document.getElementById("sendCodeBtn");
+    const verifyCodeBtn = document.getElementById("verifyCodeBtn");
+    const codeGroup = document.getElementById("codeGroup");
+    const emailInput = document.getElementById("email");
+    const codeInput = document.getElementById("verificationCode");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // 1. 인증번호 발송 버튼 클릭 시
+    sendCodeBtn.addEventListener("click", function () {
+        const email = emailInput.value;
+        if (!email) {
+            alert("이메일을 먼저 입력해주세요.");
+            return;
+        }
+
+        // 서버로 이메일 발송 요청
+        fetch("/auth/send-verification", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ "email": email })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("인증번호가 발송되었습니다. 이메일을 확인해주세요.");
+                    codeGroup.style.display = "block"; // 인증번호 입력칸 보여주기
+                    emailInput.readOnly = true; // 이메일 주소 못 바꾸게 고정
+                } else {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+            })
+            .catch(err => alert("발송 실패: " + err.message));
+    });
+
+    // 2. 인증번호 확인 버튼 클릭 시
+    verifyCodeBtn.addEventListener("click", function () {
+        const email = emailInput.value;
+        const code = codeInput.value;
+
+        if (!code) {
+            alert("인증번호를 입력해주세요.");
+            return;
+        }
+
+        // 서버로 인증번호 맞는지 확인 요청
+        fetch("/auth/verify-code", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ "email": email, "code": code })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("이메일 인증이 완료되었습니다!");
+                    isEmailVerified = true;
+                    codeInput.readOnly = true; // 코드 수정 불가
+                    verifyCodeBtn.disabled = true; // 버튼 비활성화
+
+                    // 가입하기 버튼 활성화!
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "가입하기";
+                } else {
+                    alert("인증번호가 틀렸습니다. 다시 확인해주세요.");
+                }
+            })
+            .catch(err => console.error(err));
+    });
+
+    // 3. 최종 가입하기 버튼 클릭 (기존 로직 유지 + 인증 여부 한 번 더 체크)
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        if (!isEmailVerified) {
+            alert("이메일 인증을 완료해야 가입할 수 있습니다.");
+            return;
+        }
+
+        const formData = new FormData(this);
+
+        fetch("/auth/register", {
+            method: "POST",
+            body: formData
+        })
+            .then(async response => {
+                const message = await response.text();
+
+                if (response.ok) {
+                    alert("회원가입 성공!");
+                    window.location.href = "/auth/login";
+                } else {
+                    alert(message); // 실패 메시지 출력 (중복된 닉네임 등)
+                }
+            })
+            .catch(err => {
+                alert("가입 중 에러가 발생했습니다.");
+                console.error(err);
+            });
+    });
+</script>
+</body>
+</html>

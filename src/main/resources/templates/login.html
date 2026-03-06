@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --primary-color: #6c5ce7;
+            --text-color: #333;
+            --label-color: #555;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .auth-card {
+            background-color: var(--card-bg-color);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--label-color);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            margin-top: 10px;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px;
+            border-radius: 50%;
+            background-color: var(--card-bg-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease-in-out;
+            color: var(--text-color);
+        }
+        .back-btn:hover {
+            transform: scale(1.05);
+        }
+        .back-btn svg {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<a href="/alarm" class="back-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+</a>
+<div class="auth-card">
+    <h1>로그인</h1>
+    <form th:action="@{/auth/login}" method="post">
+        <div class="form-group">
+            <label for="username">사용자 이름</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn">로그인</button>
+    </form>
+    <a href="/auth/register">회원가입</a>
+</div>
+
+<div th:if="${param.error}">
+    <script>
+        alert("로그인 실패! 아이디 또는 비밀번호를 확인하세요.");
+    </script>
+</div>
+</body>
+</html>
