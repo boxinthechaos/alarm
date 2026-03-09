@@ -1,0 +1,94 @@
+.calendar-card {
+    background: var(--card-bg-color);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    width: 90%;
+    max-width: 800px;
+    margin-top: 20px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.calendar-header h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: var(--border-color);
+    border: 1px solid var(--border-color);
+}
+
+.day-label {
+    background: var(--bg-color);
+    padding: 12px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.day-cell {
+    background: var(--card-bg-color);
+    min-height: 110px;
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: var(--text-color);
+}
+
+.day-cell:hover { background: var(--bg-color); }
+.day-cell.today { border: 2px solid var(--primary-color); }
+
+/* 일정 아이템 스타일 */
+.schedule-item {
+    background: var(--primary-color);
+    color: white;
+    font-size: 11px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    margin-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 모달 스타일 */
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--card-bg-color);
+    padding: 30px;
+    border-radius: 20px;
+    width: 350px;
+    color: var(--text-color);
+}
+
+.form-control {
+    width: 100%; padding: 12px; margin: 10px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+.btn {
+    width: 100%; padding: 12px; border: none; border-radius: 8px;
+    cursor: pointer; font-weight: 700; transition: 0.2s;
+}
+
+.btn-primary { background: var(--primary-color); color: white; }
+.btn-primary:hover { background: var(--primary-hover-color); }
+
+.btn-secondary { background: #eee; color: #333; margin-top: 10px; }

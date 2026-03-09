@@ -6,102 +6,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f2f5;
-            margin: 0;
-            flex-direction: column;
-        }
-        .container {
-            text-align: center;
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        .timer-display {
-            font-size: 4em;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-group input {
-            font-size: 1.5em;
-            width: 80px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 5px;
-            margin: 0 5px;
-        }
-        .buttons button {
-            padding: 10px 20px;
-            font-size: 1em;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #startButton {
-            background-color: #4CAF50;
-            color: white;
-        }
-        #stopButton {
-            background-color: #f44336;
-            color: white;
-        }
-        #resetButton {
-            background-color: #ff9800;
-            color: white;
-        }
-        .main-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px 0;
-            z-index: 1000;
-        }
-        .nav-item {
-            padding: 10px 20px;
-            margin: 0 10px;
-            color: #333;
-            text-decoration: none;
-            font-size: 1.1em;
-            font-weight: 500;
-            /* 아래 transition 속성을 추가해주세요 */
-            transition: color 0.3s ease, transform 0.2s ease;
-        }
-        .nav-item:hover {
-            color: #6c5ce7;
-            transform: translateY(-2px);
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/timer.css}">
 </head>
 <body>
 <nav class="main-nav">
     <a href="/alarm" class="nav-item">알람</a>
     <a href="/auth/timer" class="nav-item">타이머</a>
-
+    <a href="/auth/schedule" class="nav-item">스케줄</a>
+    <button id="themeToggle" class="nav-item" style="background:none; border:none; cursor:pointer; font-size:1.2em;">🌓</button>
 </nav>
+
 <div class="container">
     <h1>타이머</h1>
     <div class = "input-group">
-        <input type="number" id="minutesInput" placeholder="분" min="0"> :
-        <input type="number" id="secondsInput" placeholder="초" min="0">
+        <input type="number" id="minutesInput" placeholder="분" min="0"/> :
+        <input type="number" id="secondsInput" placeholder="초" min="0"/>
     </div>
     <div class="timer-display" id="display">00:00</div>
     <div class="buttons">
@@ -111,80 +31,7 @@
     </div>
 </div>
 
-<script>
-    const minutesInput = document.getElementById('minutesInput');
-    const secondsInput = document.getElementById('secondsInput');
-    const display = document.getElementById('display');
-    const startButton = document.getElementById('startButton');
-    const stopButton = document.getElementById('stopButton');
-    const resetButton = document.getElementById('resetButton');
-
-    // --- 수정된 부분 1 ---
-    // 백엔드 API를 통해 DB의 1번 오디오 파일을 가져옵니다.
-    const alarmSound = new Audio('/alarm/audio/1');
-
-    let countdown;
-    let totalSeconds;
-
-    function updateDisplay(seconds){
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds  = seconds % 60;
-        display.textContent = `${String(minutes).padStart(2,'0')}:${String(remainingSeconds).padStart(2,'0')}`;
-    }
-
-    // 오디오 정지 함수
-    function stopAlarm() {
-        alarmSound.pause();
-        alarmSound.currentTime = 0;
-    }
-
-    startButton.addEventListener('click', () => {
-        // 새 타이머 시작 시 기존 알람 소리 끄기
-        stopAlarm();
-
-        let minutes = parseInt(minutesInput.value, 10) || 0;
-        let seconds = parseInt(secondsInput.value, 10) || 0;
-        totalSeconds = (minutes * 60) + seconds;
-
-        if (totalSeconds <= 0){
-            alert("유효한 시간을 입력해 주세요.");
-            return;
-        }
-
-        clearInterval(countdown);
-
-        countdown = setInterval(() => {
-            if (totalSeconds <= 0){
-                clearInterval(countdown);
-
-                // --- 수정된 부분 2 ---
-                // 시간이 종료되면 소리를 재생합니다.
-                alarmSound.play();
-                alert("시간이 종료되었습니다!");
-                return;
-            }
-            totalSeconds--;
-            updateDisplay(totalSeconds);
-        }, 1000);
-    });
-
-    stopButton.addEventListener('click', ()=>{
-        clearInterval(countdown);
-        // --- 수정된 부분 3 ---
-        // 중지 버튼 클릭 시 소리도 멈춥니다.
-        stopAlarm();
-    });
-
-    resetButton.addEventListener('click' , ()=>{
-        clearInterval(countdown);
-        totalSeconds = 0;
-        updateDisplay(totalSeconds);
-        minutesInput.value = '';
-        secondsInput.value = '';
-        // --- 수정된 부분 4 ---
-        // 초기화 버튼 클릭 시 소리도 멈춥니다.
-        stopAlarm();
-    })
-</script>
+<script th:src="@{/js/common.js}"></script>
+<script th:src="@{/js/timer.js}"></script>
 </body>
 </html>

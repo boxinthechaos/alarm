@@ -1,6 +1,5 @@
 package org.example.qweralarm.controller;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.example.qweralarm.entity.AudioFile;
 import org.example.qweralarm.service.AlarmService;
@@ -39,7 +38,7 @@ public class AlarmController {
         if (principal != null) {
             model.addAttribute("username", principal.getName());
         }
-        return "Alarm";
+        return "alarm";
     }
 
     @PostMapping("/set")

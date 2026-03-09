@@ -1,0 +1,69 @@
+.container {
+    text-align: center;
+    background-color: var(--card-bg-color);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+h1 {
+    margin-bottom: 25px;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.timer-display {
+    font-size: 5em;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+.input-group {
+    margin-bottom: 30px;
+}
+
+.input-group input {
+    font-size: 1.5em;
+    width: 85px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 0 5px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.buttons button {
+    flex: 1;
+    padding: 15px;
+    font-size: 1.1em;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;
+}
+
+#startButton { background-color: #4CAF50; }
+#startButton:hover { background-color: #45a049; }
+
+#stopButton { background-color: #f44336; }
+#stopButton:hover { background-color: #d32f2f; }
+
+#resetButton { background-color: #ff9800; }
+#resetButton:hover { background-color: #e68a00; }
+
+.buttons button:active { transform: scale(0.95); }
