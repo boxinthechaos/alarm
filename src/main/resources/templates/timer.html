@@ -11,10 +11,20 @@
 </head>
 <body>
 <nav class="main-nav">
-    <a href="/alarm" class="nav-item">알람</a>
-    <a href="/auth/timer" class="nav-item">타이머</a>
-    <a href="/auth/schedule" class="nav-item">스케줄</a>
-    <button id="themeToggle" class="nav-item" style="background:none; border:none; cursor:pointer; font-size:1.2em;">🌓</button>
+    <div class="nav-left">
+        <a href="/alarm" class="nav-item">알람</a>
+        <a href="/auth/timer" class="nav-item">타이머</a>
+        <a href="/auth/schedule" class="nav-item">스케줄</a>
+        <a href="/auth/shop" class="nav-item">상점</a>
+    </div>
+
+    <div class="nav-right">
+    <span class="user-info">
+      <strong id="navNickname">로딩 중...</strong>님
+      (<span id="navPoint">0</span> P)
+    </span>
+        <button id="themeToggle" class="nav-item" style="background:none; border:none; cursor:pointer; font-size: 1.2em;">🌓</button>
+    </div>
 </nav>
 
 <div class="container">

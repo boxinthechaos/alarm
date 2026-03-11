@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/shop.css}">
+</head>
+<body>
+<nav class="main-nav">
+  <div class="nav-left">
+    <a href="/alarm" class="nav-item">알람</a>
+    <a href="/auth/timer" class="nav-item">타이머</a>
+    <a href="/auth/schedule" class="nav-item">스케줄</a>
+    <a href="/auth/shop" class="nav-item">상점</a>
+  </div>
+
+  <div class="nav-right">
+    <span class="user-info">
+      <strong id="navNickname">로딩 중...</strong>님
+      (<span id="navPoint">0</span> P)
+    </span>
+    <button id="themeToggle" class="nav-item" style="background:none; border:none; cursor:pointer; font-size: 1.2em;">🌓</button>
+  </div>
+</nav>
+
+<div class="shop-container">
+  <h1 class="shop-title">아이템 상점</h1>
+
+  <div class="item-grid">
+    <div th:each="item : ${items}" class="item-card">
+      <div class="item-img-box">
+        <img th:src="${item.imagePath}" alt="item-image">
+      </div>
+      <div class="item-info">
+        <span class="category-badge" th:text="${item.category}">모자</span>
+        <h3 th:text="${item.name}">아이템 이름</h3>
+        <p class="price-tag"><span th:text="${item.price}">100</span> P</p>
+        <div th:with="isOwned=${#lists.contains(ownedItemIds, item.id)}">
+          <button th:if="${isOwned}"
+                  class="buy-btn sold-out"
+                  disabled>SOLD OUT</button>
+
+          <button th:unless="${isOwned}"
+                  class="buy-btn"
+                  th:onclick="'purchaseItem(' + ${item.id} + ')'">구매하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/common.js}"></script>
+<script th:src="@{/js/shop.js}"></script>
+</body>
+</html>

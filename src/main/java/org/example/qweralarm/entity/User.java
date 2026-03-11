@@ -33,4 +33,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Long point = 0L;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserItem> purchasedItems = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Avatar avatar;
 }

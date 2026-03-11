@@ -8,6 +8,7 @@ const resetButton = document.getElementById('resetButton');
 // 백엔드 API를 통해 DB의 1번 오디오 파일을 가져옵니다.
 const alarmSound = new Audio('/alarm/audio/1');
 
+let originalSeconds;
 let countdown;
 let totalSeconds;
 
@@ -30,6 +31,9 @@ startButton.addEventListener('click', () => {
     let seconds = parseInt(secondsInput.value, 10) || 0;
     totalSeconds = (minutes * 60) + seconds;
 
+    // 1️⃣ [추가] 시작할 때 입력된 전체 시간을 변수에 따로 저장합니다.
+    originalSeconds = totalSeconds;
+
     if (totalSeconds <= 0) {
         alert("유효한 시간을 입력해 주세요.");
         return;
@@ -40,12 +44,29 @@ startButton.addEventListener('click', () => {
     countdown = setInterval(() => {
         if (totalSeconds <= 0) {
             clearInterval(countdown);
+
+            // 2️⃣ [추가] originalSeconds가 600(10분) 이상일 때만 fetch 실행
+            if (originalSeconds >= 6) {
+                fetch('/auth/timer/complete', {
+                    method: 'POST'
+                })
+                    .then(response => response.text())
+                    .then(message => {
+                        console.log("서버 응답:", message);
+                    })
+                    .catch(error => console.error('포인트 적립 실패:', error));
+
+                alert("시간이 종료되었습니다! 포인트가 적립되었습니다. 🎉");
+            } else {
+                // 10분 미만일 때는 포인트 없이 알림만
+                alert("시간이 종료되었습니다! (10분 미만은 포인트가 지급되지 않습니다)");
+            }
+
             alarmSound.play();
-            alert("시간이 종료되었습니다!");
             return;
         }
         totalSeconds--;
-        updateDisplay(totalSeconds);
+        updateDisplay(totalSeconds)
     }, 1000);
 });
 

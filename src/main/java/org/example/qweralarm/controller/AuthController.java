@@ -1,17 +1,18 @@
 package org.example.qweralarm.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.qweralarm.entity.Role;
 import org.example.qweralarm.entity.User;
 import org.example.qweralarm.repository.UserRepository;
 import org.example.qweralarm.service.AuthService;
 import org.example.qweralarm.service.EmailVerificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/auth")
@@ -64,5 +65,20 @@ public class AuthController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증번호가 일치하지 않습니다.");
         }
+    }
+
+    @GetMapping("/user-info")
+    @ResponseBody
+    public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) return ResponseEntity.status(401).build();
+
+        // UserDetails의 username(여기선 닉네임)으로 DB 조회
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow();
+
+        return ResponseEntity.ok(Map.of(
+                "nickname", user.getNickname(),
+                "point", user.getPoint()
+        ));
     }
 }

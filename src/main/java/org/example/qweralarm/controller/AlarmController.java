@@ -5,6 +5,7 @@ import org.example.qweralarm.entity.AudioFile;
 import org.example.qweralarm.service.AlarmService;
 import org.example.qweralarm.service.AudioService;
 import org.example.qweralarm.service.AuthService;
+import org.example.qweralarm.service.PointService;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class AlarmController {
     private final AlarmService alarmService;
     private final AudioService audioService;
     private final AuthService authService;
+    private final PointService pointService;
 
     @GetMapping
     public String alarmPage(Model model, Principal principal,
@@ -106,5 +108,17 @@ public class AlarmController {
         // Service에 로직 위임
         authService.deleteUser(userDetails.getUsername());
         return "redirect:/auth/logout";
+    }
+
+    @PostMapping("/stop")
+    @ResponseBody
+    public ResponseEntity<?> stopAlarm(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다");
+        }
+        String NickName = userDetails.getUsername();
+
+        pointService.addPoint(NickName, 100L);
+        return ResponseEntity.ok("알람 종료! " + NickName + "님 100포인트 적립!");
     }
 }
