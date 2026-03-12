@@ -10,7 +10,7 @@
     --nav-bg: #ffffff;
 }
 
-[data-theme='dark'] {
+:root[data-theme='dark'] {
     --bg-color: #18191a;
     --card-bg-color: #242526;
     --text-color: #e4e6eb;
@@ -35,7 +35,7 @@ body {
     align-items: center;
     min-height: 100vh;
     padding-top: 60px;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.2s ease;
 }
 
 .main-nav {
@@ -98,4 +98,158 @@ body {
     margin-left: 10px;
     color: var(--primary-color);
     text-decoration: none;
+}
+
+/* --- 우측 하단 고정 아바타 --- */
+.fixed-avatar-wrapper {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 200px;
+    height: 200px;
+    z-index: 9999;
+    pointer-events: none;
+    image-rendering: pixelated;
+}
+
+.fixed-avatar-wrapper .avatar-view {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.fixed-avatar-wrapper img {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* 몸통 */
+.fixed-avatar-wrapper .layer-base {
+    bottom: 0;
+    width: 200px;
+    z-index: 1;
+}
+
+/* 의상 */
+.fixed-avatar-wrapper .layer-clothes {
+    top: 67%;
+    width: 200px;
+    z-index: 3;
+    transform: translate(-50%, -50%);
+}
+
+/* 모자 (기본 CAP 좌표) */
+.fixed-avatar-wrapper .layer-hat {
+    top: -42%; /* 캐릭터 머리 위 */
+    width: 200px;
+    left: 42%;
+    z-index: 5;
+}
+
+/* --- 미니 아바타 (상단바 등 공용) --- */
+.mini-avatar-container {
+    display: inline-block;
+}
+
+.avatar-view-small {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    image-rendering: pixelated;
+}
+
+.avatar-view-small img {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.avatar-view-small .layer-base { bottom: 0; width: 40px; }
+.avatar-view-small .layer-clothes { top: 60%; width: 40px; transform: translate(-50%, -50%); }
+.avatar-view-small .layer-hat { top: -5px; width: 40px; }
+
+/* 말풍선 컨테이너 */
+.avatar-bubble {
+    position: absolute;
+    z-index: 1000 !important; /* 다른 레이어보다 위에 오도록 */
+    display: none;
+    align-items: center;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    pointer-events: auto !important; /* 클릭 이벤트를 허용 */
+}
+
+#cancelAlarmBtn:hover {
+    color: #d43f3f !important;
+    transform: scale(1.2);
+    transition: transform 0.2s;
+}
+
+/* 말풍선 꼬리표 */
+.avatar-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top: 8px solid var(--primary-color);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+}
+
+.shake-animation {
+    animation: shake 0.5s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -5px); }
+}
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+}
+
+/* 둥둥 뜨는 효과 */
+@keyframes float {
+    0% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -8px); }
+    100% { transform: translate(-50%, 0); }
+}
+
+/* 다크모드 대응 */
+:root[data-theme='dark'] .avatar-bubble {
+    background: var(--card-bg-color);
+    color: var(--text-color);
+    border-color: var(--primary-color);
+}
+.bubble-x-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer !important;
+    background: #ff5f5f;
+    color: white;
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+    pointer-events: auto !important; /* 클릭 무조건 허용 */
+    z-index: 1001;
+}
+.bubble-x-btn:hover {
+    background: #d43f3f;
 }

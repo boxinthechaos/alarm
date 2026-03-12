@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/inventory.css}">
+</head>
+<body>
+<nav class="main-nav">
+    <div class="nav-left">
+        <a href="/alarm" class="nav-item">알람</a>
+        <a href="/auth/timer" class="nav-item">타이머</a>
+        <a href="/auth/schedule" class="nav-item">스케줄</a>
+        <a href="/auth/shop" class="nav-item">상점</a>
+        <a href="/auth/shop/inventory" class="nav-item">인벤토리</a>
+    </div>
+
+    <div class="nav-right">
+    <span class="user-info">
+      <strong id="navNickname">로딩 중...</strong>님
+      (<span id="navPoint">0</span> P)
+    </span>
+        <button id="themeToggle" class="nav-item" style="background:none; border:none; cursor:pointer; font-size: 1.2em;">🌓</button>
+    </div>
+</nav>
+<div class="inventory-wrapper">
+    <h1 class="page-title">내 인벤토리</h1>
+
+    <div class="inventory-container">
+        <div class="inventory-left">
+            <div class="tabs-container">
+                <button class="tab-btn active" data-filter="ALL">전체</button>
+                <button class="tab-btn" data-filter="CAP">모자</button>
+                <button class="tab-btn" data-filter="CLOTHES">의상</button>
+            </div>
+
+            <div class="item-grid">
+                <div th:each="userItem : ${userItems}" class="item-slot" th:data-category="${userItem.item.category}">
+                    <div class="slot-image">
+                        <img th:src="${userItem.item.imagePath}" alt="item">
+                    </div>
+                    <div class="slot-info">
+                        <span th:text="${userItem.item.name}">아이템명</span>
+
+                        <button th:if="${(userItem.item.category == 'CAP' and userItem.item.imagePath == avatar.currentHatPath) or
+                        (userItem.item.category == 'CLOTHES' and userItem.item.imagePath == avatar.currentClothesPath)}"
+                                class="equip-btn unequip"
+                                th:data-category="${userItem.item.category}"
+                                onclick="unequipItem(this.getAttribute('data-category'))">
+                            해제하기
+                        </button>
+
+                        <button th:unless="${(userItem.item.category == 'CAP' and userItem.item.imagePath == avatar.currentHatPath) or
+                           (userItem.item.category == 'CLOTHES' and userItem.item.imagePath == avatar.currentClothesPath)}"
+                                class="equip-btn"
+                                th:data-id="${userItem.item.id}"
+                                onclick="equipItem(this.getAttribute('data-id'))">
+                            장착하기
+                        </button>
+                    </div>
+                </div>
+
+                <div class="item-slot empty" th:each="i : ${#numbers.sequence(1, 4)}"></div>
+            </div>
+        </div>
+
+        <div class="inventory-right">
+            <div class="character-circle">
+                <div class="avatar-view">
+                    <img src="/images/avatar/Avatar.gif" class="layer-base">
+                    <img th:if="${avatar.currentClothesPath}" th:src="${avatar.currentClothesPath}" id="mainClothes" class="layer-clothes">
+                    <img th:if="${avatar.currentHatPath}" th:src="${avatar.currentHatPath}" id="mainHat" class="layer-hat">
+                </div>
+                <div class="character-info">
+                    <span class="user-name" id="previewNickname" th:text="${#authentication.name}">사용자명</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/common.js}"></script>
+<script th:src="@{/js/Avatar.js}"></script>
+</body>
+</html>

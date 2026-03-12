@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Avatar Fragment</title>
+</head>
+<body>
+<div th:fragment="miniAvatar(avatar)" class="mini-avatar-container">
+    <div class="avatar-view-small">
+        <img src="/images/avatar/Avatar.gif" class="layer-base">
+
+        <img th:if="${avatar.currentClothesPath}"
+             th:src="${avatar.currentClothesPath}"
+             class="layer-clothes">
+
+        <img th:if="${avatar.currentHatPath}"
+             th:src="${avatar.currentHatPath}"
+             class="layer-hat">
+    </div>
+</div>
+</body>
+</html>

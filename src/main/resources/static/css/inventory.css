@@ -1,0 +1,156 @@
+.inventory-wrapper {
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 20px;
+}
+
+.inventory-container {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* 왼쪽 아이템 그리드 */
+.inventory-left {
+    flex: 1.5;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 30px;
+    border: 2px solid var(--border-color);
+}
+
+.tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.tab-btn {
+    padding: 8px 20px;
+    border-radius: 30px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+}
+
+.item-slot {
+    background: var(--card-bg-color);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s;
+
+}
+
+.item-slot[style*="display: block"] {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.item-slot:hover { transform: translateY(-5px); }
+
+.slot-image img {
+    width: 80px;
+    height: 80px;
+    image-rendering: pixelated; /* 도트 선명도 유지 */
+}
+
+/* 오른쪽 캐릭터 서클 (그려주신 핵심 디자인) */
+.inventory-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.character-circle {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, var(--card-bg-color) 0%, var(--bg-color) 100%);
+    border-radius: 50%;
+    border: 5px solid var(--primary-color);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 40px rgba(0,0,0,0.3);
+}
+
+.avatar-view {
+    position: relative; /* 중요: 자식 요소(모자)의 기준점이 됩니다 */
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible; /* 모자가 위로 튀어나올 수 있게 */
+}
+
+.layer-base {
+    width: 150px; /* 캐릭터 크기에 맞게 조절 */
+    height: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.layer-hat {
+    position: absolute !important;
+    z-index: 5 !important; /* 몸통보다 무조건 위로 */
+
+    /* 위치 미세 조정 */
+    top: -38px;       /* 캐릭터 머리 높이에 맞춰 조절 (숫자가 작을수록 위로) */
+    left: 44%;       /* 가로 중앙 기준 */
+    transform: translateX(-50%); /* 정확한 중앙 정렬 */
+
+    width: 150px;    /* 모자 크기 (이미지 크기에 맞춰 조절) */
+    height: auto;
+    pointer-events: none; /* 모자 클릭 안 되게 */
+}
+.character-info {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: var(--primary-color);
+    padding: 5px 20px;
+    border-radius: 20px;
+    color: white;
+}
+
+.layer-clothes {
+    position: absolute !important;
+    z-index: 3 !important; /* 몸통(1) 보다는 위, 모자(5) 보다는 아래 */
+
+    /* 위치 조정: 몸통에 딱 맞게 */
+    top: 62% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important; /* 중앙에 배치 */
+
+    width: 150px !important; /* 캐릭터 몸통 크기에 맞춰서 조절 */
+    height: auto !important;
+    pointer-events: none;
+}
+
+.layer-hat.type-hap {
+    /* 중절모는 파일 안에서 위치가 낮으므로 더 위로 끌어올려야 합니다 */
+    top: -65px;
+    left: 50%; /* 수염이 중앙에 오도록 조정 */
+    width: 180px; /* 수염까지 포함되어 있으니 크기를 좀 더 키워야 할 수 있습니다 */
+}
