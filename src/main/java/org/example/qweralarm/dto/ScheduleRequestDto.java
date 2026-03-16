@@ -14,4 +14,6 @@ public class ScheduleRequestDto {
     private String date;
     private String content;
     private String time;
+    private boolean completed;
+    private String color;
 }

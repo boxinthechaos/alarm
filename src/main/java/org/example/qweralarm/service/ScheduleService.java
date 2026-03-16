@@ -3,13 +3,17 @@ package org.example.qweralarm.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.qweralarm.dto.ScheduleRequestDto;
+import org.example.qweralarm.entity.ActivityLog;
+import org.example.qweralarm.entity.ActivityType;
 import org.example.qweralarm.entity.Schedule;
 import org.example.qweralarm.entity.User;
+import org.example.qweralarm.repository.ActivityLogRepository;
 import org.example.qweralarm.repository.ScheduleRepository;
 import org.example.qweralarm.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -18,6 +22,7 @@ import java.util.NoSuchElementException;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
+    private final ActivityLogRepository activityLogRepository;
 
     @Transactional
     public void delete(Long id){
@@ -33,6 +38,7 @@ public class ScheduleService {
                 .targetDate(LocalDate.parse(dto.getDate()))
                 .targetTime(dto.getTime())
                 .content(dto.getContent())
+                .color(dto.getColor())
                 .user(user)
                 .build();
 
@@ -52,7 +58,30 @@ public class ScheduleService {
                 s.getId(),
                 s.getTargetDate().toString(),
                 s.getContent(),
-                s.getTargetTime()
+                s.getTargetTime(),
+                s.isCompleted(),
+                s.getColor()
         )).toList();
+    }
+
+    @Transactional
+    public boolean toggleScheduleComplete(Long ScheduleId, String nickname){
+        Schedule schedule = scheduleRepository.findByIdAndUserNickname(ScheduleId, nickname)
+                .orElseThrow(() -> new IllegalArgumentException("해당 스케줄이 없거나 권한이 없습니다"));
+
+        if(!schedule.isCompleted()){
+            schedule.successSchedule();
+            ActivityLog log = ActivityLog.builder()
+                    .type(ActivityType.SCHEDULE)
+                    .isSuccess(true)
+                    .createdAt(LocalDateTime.now())
+                    .user(schedule.getUser())
+                    .build();
+            activityLogRepository.save(log);
+        } else {
+            schedule.cancelSuccess();
+        }
+
+        return schedule.isCompleted();
     }
 }

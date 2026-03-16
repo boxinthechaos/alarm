@@ -1,9 +1,8 @@
 package org.example.qweralarm.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.qweralarm.entity.Alarm;
-import org.example.qweralarm.entity.AudioFile;
-import org.example.qweralarm.entity.User;
+import org.example.qweralarm.entity.*;
+import org.example.qweralarm.repository.ActivityLogRepository;
 import org.example.qweralarm.repository.AlarmRepository;
 import org.example.qweralarm.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -11,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,9 +24,11 @@ public class AlarmService {
     private final AlarmRepository alarmRepository;
     private final UserRepository userRepository;
     private final AudioService audioService; // 다른 서비스를 불러와서 협력 가능!
+    private final ActivityLogRepository activityLogRepository;
+    private final PointService pointService;
 
     @Transactional
-    public Long createAlarm(String username, String time, MultipartFile file) throws IOException {
+    public Map<String, Long> createAlarm(String username, String time, MultipartFile file) throws IOException {
         User user = userRepository.findByNickname(username)
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
 
@@ -42,7 +45,10 @@ public class AlarmService {
         newAlarm.setAudioFile(audioToUse);
         alarmRepository.save(newAlarm);
 
-        return audioToUse.getId();
+        return Map.of(
+                "audioId", audioToUse.getId(),
+                    "alarmId", newAlarm.getId()
+         );
     }
 
     @Transactional(readOnly = true)
@@ -86,5 +92,37 @@ public class AlarmService {
                         "song", alarm.getAudioFile().getFilename()
                 )
         ).toList();
+    }
+
+    @Transactional
+    public Map<String, Object> stopAlarm(Long alarmId, String username){
+        Alarm alarm = alarmRepository.findById(alarmId)
+                .orElseThrow(() -> new RuntimeException("알람을 찾을 수 없습니다"));
+        User user = alarm.getUser();
+
+        LocalTime now = LocalTime.now();
+        LocalTime scheduledTime = alarm.getAlarmTime();
+
+        long diffInSeconds = Duration.between(scheduledTime, now).getSeconds();
+        boolean isSuccess = diffInSeconds >= 0 && diffInSeconds <= 300;
+
+        if(isSuccess){
+            pointService.addPoint(user.getNickname(), 100L);
+        }
+
+        ActivityLog log = ActivityLog.builder()
+                .type(ActivityType.ALARM)
+                .isSuccess(isSuccess)
+                .createdAt(LocalDateTime.now())
+                .user(user)
+                .duration(diffInSeconds)
+                .build();
+        activityLogRepository.save(log);
+
+
+        return Map.of(
+                "success", isSuccess,
+                "message", isSuccess ? "⏰ 미션 성공! 활기찬 아침입니다." : "⏰ 미션 실패! 다음엔 조금 더 서둘러주세요."
+        );
     }
 }

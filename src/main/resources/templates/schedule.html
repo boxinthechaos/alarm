@@ -66,12 +66,35 @@
     </div>
 </div>
 
+<div id="dayScheduleModal" class="modal">
+    <div class="modal-content day-view-content">
+        <div class="view-header">
+            <div class="header-info">
+                <h2 id="selectedDayNum">11일</h2>
+                <p id="selectedDayFull">수요일</p>
+            </div>
+            <button onclick="closeDayModal()" class="close-x">&times;</button>
+        </div>
+
+        <div id="dayScheduleList" class="day-schedule-list">
+        </div>
+
+        <button onclick="openAddModal()" class="floating-add-btn">+</button>
+    </div>
+</div>
+
 <div id="scheduleModal" class="modal">
     <div class="modal-content">
         <h3 id="targetDateTitle">일정 추가</h3>
-        <input type="time" id="timeInput" class="form-control"> <input type="text" id="scheduleInput" class="form-control" placeholder="무엇을 하나요?">
-        <button onclick="saveToSpring()" class="btn btn-primary">저장하기</button>
-        <button onclick="closeModal()" class="btn btn-secondary">닫기</button>
+        <input type="time" id="timeInput" class="form-control">
+        <input type="color" id="colorInput" class="form-control" style="height:40px;">
+        <input type="text" id="scheduleInput" class="form-control" placeholder="할 일을 입력하세요">
+
+        <div class="modal-btns">
+            <button id="modalSaveBtn" onclick="saveSchedule()" class="btn btn-primary">저장</button>
+            <button id="modalDeleteBtn" onclick="deleteSchedule()" class="btn btn-danger" style="display:none;">삭제</button>
+            <button onclick="closeModal()" class="btn btn-secondary">닫기</button>
+        </div>
     </div>
 </div>
 

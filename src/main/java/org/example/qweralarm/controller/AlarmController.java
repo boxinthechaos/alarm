@@ -51,7 +51,7 @@ public class AlarmController {
         if (userDetails == null) return ResponseEntity.status(401).body("로그인이 필요합니다");
 
         // Service에 로직 위임
-        Long audioId = alarmService.createAlarm(userDetails.getUsername(), time, file);
+        Map<String, Long> audioId = alarmService.createAlarm(userDetails.getUsername(), time, file);
         return ResponseEntity.ok(Map.of("audioId", audioId));
     }
 
@@ -112,13 +112,12 @@ public class AlarmController {
 
     @PostMapping("/stop")
     @ResponseBody
-    public ResponseEntity<?> stopAlarm(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> stopAlarm(@RequestParam Long alarmId, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(401).body("로그인이 필요합니다");
         }
-        String NickName = userDetails.getUsername();
+        Map<String, Object> result = alarmService.stopAlarm(alarmId, userDetails.getUsername());
 
-        pointService.addPoint(NickName, 100L);
-        return ResponseEntity.ok("알람 종료! " + NickName + "님 100포인트 적립!");
+        return ResponseEntity.ok(result);
     }
 }
