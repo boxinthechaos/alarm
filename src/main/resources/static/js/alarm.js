@@ -10,15 +10,12 @@ const fileNameDisplay = document.getElementById('fileName');
 const playerTitle = document.getElementById('playerTitle');
 const alarmClockCard = document.getElementById('alarmClockCard');
 const alarmBubble = document.getElementById('alarmBubble');
-const bubbleText = document.getElementById('bubbleText');
-const cancelAlarmBtn = document.getElementById('cancelAlarmBtn');
 
 // --- 상태 관리 변수 ---
 let isRinging = false;
-let activeAlarms = []; // 여러 알람을 담는 배열
-let masterInterval = null; // 1초마다 검사하는 단 하나의 심장
-let currentRingingAlarmId = null; // 현재 울리고 있는 알람의 Id 저장
-const activeAlarmList = document.getElementById('activeAlarmList');
+let activeAlarms = [];
+let masterInterval = null;
+let currentRingingAlarmId = null;
 
 fileInput.addEventListener('change', () => {
     fileNameDisplay.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : '선택된 파일 없음';
@@ -43,10 +40,7 @@ alarmForm.addEventListener('submit', function(event) {
         })
         .then(data => {
             alert(`${targetTime} 알람이 추가되었습니다!`);
-            console.log("서버 응답 확인:", data);
-            console.log("data 전체:", JSON.stringify(data)); // 구조 확인용
             armAlarm(targetTime, data.audioId.audioId, data.audioId.alarmId);
-
             loadHistory();
             submitBtn.disabled = false;
             submitBtn.textContent = '설정 완료';
@@ -73,7 +67,6 @@ function armAlarm(targetTime, audioId, alarmId) {
     renderActiveAlarms();
     console.log("현재 대기 중인 알람 목록:", activeAlarms);
 
-    // 마스터 인터벌이 없으면 여기서 생성 (단 한 번만 실행됨)
     if (!masterInterval) {
         masterInterval = setInterval(checkAllAlarms, 1000);
     }
@@ -84,13 +77,10 @@ function checkAllAlarms() {
     const now = new Date();
     const currentH = now.getHours();
     const currentM = now.getMinutes();
-    const currentS = now.getSeconds();
 
-    // 매 분 0초에 한 번만 실행되도록 하거나, triggered로 방어
     activeAlarms.forEach(alarm => {
         if (!alarm.triggered) {
             const [targetH, targetM] = alarm.time.split(":").map(Number);
-
             if (currentH === targetH && currentM === targetM) {
                 alarm.triggered = true;
                 playSpecificAlarm(alarm);
@@ -102,15 +92,12 @@ function checkAllAlarms() {
 // 실제로 알람이 울리는 시점
 function playSpecificAlarm(alarm) {
     cancelAlarm(alarm.alarmId);
-    // UI 전환: 알람이 울릴 때만 플레이어 섹션을 보여줌
     settingsSection.style.display = 'none';
     playerSection.style.display = 'block';
     displayTime.textContent = alarm.time;
     playerTitle.textContent = "⏰ 알람 울리는 중! ⏰";
     alarmClockCard.classList.add('ringing');
-    currentRingingAlarmId = alarm.alarmId;
 
-    // 오디오 재생
     console.log("재생할 오디오 ID:", alarm.audioId);
     audio.src = `/alarm/audio/${alarm.audioId}`;
     audio.play().catch(e => console.error("오디오 재생 실패:", e));
@@ -119,7 +106,7 @@ function playSpecificAlarm(alarm) {
     currentRingingAlarmId = alarm.alarmId;
 }
 
-// 알람 끄기 (포인트 지급 로직 포함)
+// 알람 끄기
 function stopAudio() {
     audio.pause();
     audio.currentTime = 0;
@@ -130,21 +117,16 @@ function stopAudio() {
         console.log("보내는 alarmId:", currentRingingAlarmId);
         fetch(`/alarm/stop?alarmId=${currentRingingAlarmId}`, { method: 'POST' })
             .then(response => {
-                console.log("서버 응답 상태:", response.status);
-
-                // ✅ 이 부분 추가
                 if (response.status === 401) {
                     alert("로그인이 필요합니다.");
                     window.location.href = '/login';
                     return null;
                 }
-
                 if (!response.ok) throw new Error("서버 응답 오류");
                 return response.json();
             })
             .then(data => {
-                if (!data) return; // ✅ null 체크
-                console.log("서버 데이터:", data);
+                if (!data) return;
                 alert(data.message);
                 isRinging = false;
                 currentRingingAlarmId = null;
@@ -160,24 +142,45 @@ function stopAudio() {
     }
 }
 
+// 버블 UI 렌더링
 function renderActiveAlarms() {
-    if (alarmBubble) {
-        if (activeAlarms.length === 0) {
-            alarmBubble.style.display = 'none';
-            return;
-        }
-        alarmBubble.style.display = 'flex';
-        bubbleText.textContent = `⏰ ${activeAlarms.map(a => a.time).join(', ')}`;
+    if (!alarmBubble) return;
+
+    if (activeAlarms.length === 0) {
+        alarmBubble.style.display = 'none';
+        return;
     }
+
+    alarmBubble.style.display = 'flex';
+    alarmBubble.style.flexDirection = 'column';
+    alarmBubble.style.alignItems = 'stretch';
+    alarmBubble.style.cursor = 'pointer';
+
+    let list = document.getElementById('activeAlarmList');
+    if (!list) {
+        list = document.createElement('div');
+        list.id = 'activeAlarmList';
+        alarmBubble.appendChild(list);
+    }
+    list.style.display = 'black';
+    list.innerHTML = '';
+
+    activeAlarms.forEach(alarm => {
+        const item = document.createElement('div');
+        item.className = 'alarm-list-item';
+        item.innerHTML = `
+            <span>⏰ ${alarm.time}</span>
+            <button class="alarm-cancel-btn" data-id="${alarm.alarmId}">✕</button>
+        `;
+        item.querySelector('.alarm-cancel-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            cancelAlarm(alarm.alarmId);
+        });
+        list.appendChild(item);
+    });
 }
 
-cancelAlarmBtn.addEventListener('click', () => {
-    if (activeAlarms.length > 0) {
-        cancelAlarm(activeAlarms[activeAlarms.length - 1].alarmId);
-    }
-});
-
-// 수동 리셋 버튼
+// 수동 리셋
 function resetAlarm() {
     audio.pause();
     audio.currentTime = 0;
@@ -191,7 +194,6 @@ function setAlarmFromHistory(time, audioId, songName) {
     document.getElementById('time-input').value = time;
     fileNameDisplay.textContent = `(기록 선택됨) ${songName}`;
 
-    // hidden input 처리 (파일 업로드 대신 기존 ID 사용 시)
     let hiddenInput = alarmForm.querySelector('input[name="audioId"]');
     if (!hiddenInput) {
         hiddenInput = document.createElement('input');
@@ -243,6 +245,7 @@ function loadHistory() {
 
 document.addEventListener('DOMContentLoaded', loadHistory);
 
+// 알람 취소
 function cancelAlarm(alarmId) {
     activeAlarms = activeAlarms.filter(alarm => alarm.alarmId !== alarmId);
 
@@ -251,5 +254,5 @@ function cancelAlarm(alarmId) {
         masterInterval = null;
     }
 
-    renderActiveAlarms(); // UI 갱신
+    renderActiveAlarms();
 }

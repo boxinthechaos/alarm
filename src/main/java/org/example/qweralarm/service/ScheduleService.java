@@ -34,15 +34,29 @@ public class ScheduleService {
         User user = userRepository.findByNickname(userNickname)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다"));
 
-        Schedule schedule = Schedule.builder()
-                .targetDate(LocalDate.parse(dto.getDate()))
-                .targetTime(dto.getTime())
-                .content(dto.getContent())
-                .color(dto.getColor())
-                .user(user)
-                .build();
+        Schedule schedule;
 
-        scheduleRepository.save(schedule);
+
+        if(dto.getId() != null){
+            schedule = scheduleRepository.findById(dto.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("수정할 스케줄이 존재하지 않습니다."));
+
+            schedule.updateSchedule(
+                    LocalDate.parse(dto.getDate()),
+                    dto.getTime(),
+                    dto.getContent(),
+                    dto.getColor());
+        }
+        else {
+            Schedule newSchedule = Schedule.builder()
+                    .targetDate(LocalDate.parse(dto.getDate()))
+                    .targetTime(dto.getTime())
+                    .content(dto.getContent())
+                    .color(dto.getColor())
+                    .user(user)
+                    .build();
+            scheduleRepository.save(newSchedule);
+        }
     }
     public List<ScheduleRequestDto> findAllByUser(String nickname) {
         // 1. 에러 나기 전에 출력부터! (이게 먼저 와야 함)

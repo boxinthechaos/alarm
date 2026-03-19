@@ -45,4 +45,11 @@ public class Schedule {
         this.isCompleted = false;
         this.completedAt = null;
     }
+
+    public void updateSchedule(LocalDate targetDate, String targetTime, String content, String color) {
+        this.targetDate = targetDate;
+        this.targetTime = targetTime;
+        this.content = content;
+        this.color = color;
+    }
 }

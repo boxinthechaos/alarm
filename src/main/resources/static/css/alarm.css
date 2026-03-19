@@ -129,3 +129,36 @@ input[type="file"] {
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
+
+#alarmBubble {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    min-width: 160px;
+}
+
+#activeAlarmList {
+    margin-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.4);
+    padding-top: 6px;
+}
+
+.alarm-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 14px;
+}
+
+.alarm-cancel-btn {
+    background: rgba(255, 82, 82, 0.85);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 1;
+    flex-shrink: 0;
+}
